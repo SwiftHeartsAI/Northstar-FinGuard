@@ -1,7 +1,7 @@
 # Ethics, Limitations, and Cost-to-Scale Analysis
 
 *Northstar-FinGuard*
-*Numbers sourced from `eval_dataset/results_final.json` (12 hand-labeled cases, 14 ground-truth claims) unless otherwise noted. Pricing sourced via live web search, August 2026 — verify against the Azure pricing calculator before citing in a final submission, as these change frequently.*
+*Numbers sourced from `eval_dataset/results_final.json` (12 hand-labeled cases, 14 ground-truth claims) unless otherwise noted. Pricing sourced via live web search in August 2026, with chat-model pricing updated for `gpt-5.4-mini` in October 2026 — verify against the Azure pricing calculator before citing in a final submission, as these change frequently.*
 
 ## 1. Intended use and human oversight
 
@@ -22,7 +22,7 @@ These come directly from the eval harness (`src/eval/run_eval.py`), not general 
 | Intake audience accuracy | **66.7%** | Retail vs. mixed vs. institutional audience is frequently underdetermined from text alone — see below. |
 | Claim extraction precision | **83.3%** | ~1 in 6 extracted "claims" is a false positive (over-extraction), which could waste reviewer time but is a safer failure mode than missing a real claim. |
 | Grounding recall@3 | **81.8%** | After reranking to the top 3 evidence chunks, roughly 1 in 5 claims loses a relevant grounding passage that was present in the wider retrieval set. |
-| Compliance tier exact accuracy | **85.7%** | 1 of 14 claims was a boundary judgment call between adjacent tiers, not a clean model error (documented in `eval_dataset/cases.json`). |
+| Compliance tier exact accuracy | **85.7%** | 12 of 14 claims scored exactly. Both misses are the two claims in `clean_multi_claim_institutional` (expected Tier 1, got Tier 2), a boundary judgment call between adjacent tiers rather than a clean model error (documented in `eval_dataset/cases.json`). That case is also the single document-level miss below. |
 | Overall document-tier accuracy | **91.7%** | End-to-end, tier-within-one accuracy is 100% — the model doesn't miss a tier by more than one step in this eval set. |
 
 **Re-run (October 2026):** Re-running the same 12-case eval gave intake audience accuracy 75%, claim extraction precision 75%, grounding recall@3 82%, compliance tier exact accuracy 79% and overall document-tier accuracy 83% (tier-within-one still 100%). The differences from the table above most likely reflect variation in the model's outputs between runs. On a 12-case set, one case moves a document-level score by about 8 points, so these figures are best read as a range rather than a fixed score.
@@ -69,7 +69,7 @@ Pricing used (approximate; Azure OpenAI, Global Standard, as found October 2026)
 - **Embedding cost/doc** ≈ negligible (< $0.000001)
 - **≈ $0.008 per document reviewed**, essentially all of it LLM inference, none of it meaningfully from embeddings.
 
-**Measured (October 2026):** A traced eval run (12 cases, 40 chat calls) used 16,802 input and 2,455 output tokens, about 1,400 input and 205 output per case, or roughly $0.002 per case at the prices above. This is lower than the estimate because the eval doesn't run the executive-summary agent and feeds the later agents ground-truth claims. Treat it as a lower bound on full-pipeline cost per document, not a replacement for the estimate.
+**Measured (October 2026):** A traced eval run (12 cases) logged 40 chat calls: the 38 the eval makes (12 intake, 12 extraction, 14 compliance-risk) plus one intake and one extraction call from an earlier attempt a few minutes before that stopped partway through its first case. Together they used 16,802 input and 2,455 output tokens, about 1,400 input and 205 output per case (slightly overstated because of the two extra calls), or roughly $0.002 per case at the prices above. This is lower than the estimate because the eval doesn't run the executive-summary agent and feeds the later agents ground-truth claims. Treat it as a lower bound on full-pipeline cost per document, not a replacement for the estimate.
 
 ### The actual cost driver at scale isn't inference — it's the Search tier floor
 
@@ -84,7 +84,7 @@ Putting it together at illustrative volumes:
 |---|---|---|---|
 | 100 | ~$0.80 | $75 | ~$75.80 |
 | 1,000 | ~$8 | $75 | ~$83 |
-| 10,000 | ~$80 | $75 (likely need Standard soon) | ~$330 |
+| 10,000 | ~$80 | $250 (Standard S1) | ~$330 |
 
 **The non-obvious takeaway:** at this knowledge-base size, scaling review *volume* is nearly free on the model side — going from 100 to 10,000 documents/month moves inference cost by tens of dollars, not thousands. The real cost-to-scale question isn't "how many documents can we afford to review," it's "how big does the knowledge base get, and what query throughput does that demand" — because that's what determines the Search tier, and the Search tier is the dominant fixed cost by an order of magnitude at low-to-moderate volume. This also means the system doesn't get meaningfully cheaper per-document at scale (no real economies of scale in the LLM cost), but it doesn't get punishingly expensive either — cost scales roughly linearly with claims extracted, which scales with document volume and complexity, not with some worse-than-linear factor.
 
