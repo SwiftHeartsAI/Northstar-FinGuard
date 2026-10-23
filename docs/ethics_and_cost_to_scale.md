@@ -59,7 +59,7 @@ The codebase does not currently log token usage (no `usage`/`token_count` fields
 | Executive summary | 900 | 400 | 1 |
 | Embedding (per claim) | 40 | — | 1.17 |
 
-Pricing used (Azure OpenAI, Global Standard, as found August 2026 — **reverify before publishing**): `gpt-5-mini`-tier ≈ $0.25 / 1M input tokens, $2.00 / 1M output tokens ([Azure OpenAI pricing](https://azure.microsoft.com/en-us/pricing/details/azure-openai/)); `text-embedding-3-small` ≈ $0.02 / 1M input tokens.
+Pricing used (Azure OpenAI, Global Standard, as found August 2026): `gpt-5-mini`-tier ≈ $0.25 / 1M input tokens, $2.00 / 1M output tokens ([Azure OpenAI pricing](https://azure.microsoft.com/en-us/pricing/details/azure-openai/)); `text-embedding-3-small` ≈ $0.02 / 1M input tokens.
 
 - Input tokens/doc ≈ 2,200 (fixed) + 1,634 (risk calls) + 47 (embeddings) ≈ **3,880**
 - Output tokens/doc ≈ 850 (fixed) + 292 (risk calls) ≈ **1,140**
