@@ -49,7 +49,7 @@ So per document: **3 fixed chat calls + 1 chat call per claim**, plus **1 embedd
 
 ### Estimated $ cost per document
 
-Token usage was not recorded when these figures were produced: LangSmith tracing only began on 23 October 2026, when the Azure OpenAI client was wrapped with LangSmith's `wrap_openai`, and there is no trace data from earlier eval runs. The figures below are therefore **engineering estimates** based on actual prompt/context sizes in `src/agents/*.py`, not measured data. Eval runs from 23 October 2026 onward (with `LANGSMITH_TRACING=true`) record per-call token counts; re-run the eval and use those measured figures before citing a final number in the capstone report.
+Token usage was not recorded when these figures were produced: LangSmith tracing began on 23 October 2026, when the Azure OpenAI client was wrapped with LangSmith's `wrap_openai`, and there is no trace data from earlier eval runs. The figures below are therefore **engineering estimates** based on actual prompt/context sizes in `src/agents/*.py`, not measured data. Eval runs from 23 October 2026 onward (with `LANGSMITH_TRACING=true`) record per-call token counts; re-run the eval and use those measured figures before citing a final number in the capstone report.
 
 | Call type | Est. input tokens | Est. output tokens | Calls/doc (avg) |
 |---|---|---|---|
