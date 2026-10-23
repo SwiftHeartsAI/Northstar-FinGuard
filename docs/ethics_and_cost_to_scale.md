@@ -61,15 +61,15 @@ Token usage was not recorded when these figures were produced: LangSmith tracing
 | Executive summary | 900 | 400 | 1 |
 | Embedding (per claim) | 40 | — | 1.17 |
 
-Pricing used (approximate; Azure OpenAI, Global Standard, as found August 2026): `gpt-5-mini`-tier ≈ $0.25 / 1M input tokens, $2.00 / 1M output tokens ([Azure OpenAI pricing](https://azure.microsoft.com/en-us/pricing/details/azure-openai/)); `text-embedding-3-small` ≈ $0.02 / 1M input tokens.
+Pricing used (approximate; Azure OpenAI, Global Standard, as found October 2026): `gpt-5.4-mini` ≈ $0.75 / 1M input tokens, $4.50 / 1M output tokens ([Azure OpenAI pricing](https://azure.microsoft.com/en-us/pricing/details/azure-openai/)); `text-embedding-3-small` ≈ $0.02 / 1M input tokens.
 
 - Input tokens/doc ≈ 2,200 (fixed) + 1,634 (risk calls) + 47 (embeddings) ≈ **3,880**
 - Output tokens/doc ≈ 850 (fixed) + 292 (risk calls) ≈ **1,140**
-- **Chat cost/doc** ≈ (3,880 × $0.25 + 1,140 × $2.00) / 1,000,000 ≈ **$0.0033**
+- **Chat cost/doc** ≈ (3,880 × $0.75 + 1,140 × $4.50) / 1,000,000 ≈ **$0.0080**
 - **Embedding cost/doc** ≈ negligible (< $0.000001)
-- **≈ $0.003–0.004 per document reviewed**, essentially all of it LLM inference, none of it meaningfully from embeddings.
+- **≈ $0.008 per document reviewed**, essentially all of it LLM inference, none of it meaningfully from embeddings.
 
-**Measured (October 2026):** A traced eval run (12 cases, 40 chat calls) used 16,802 input and 2,455 output tokens, about 1,400 input and 205 output per case, or roughly $0.0008 per case at the prices above. This is lower than the estimate because the eval doesn't run the executive-summary agent and feeds the later agents ground-truth claims. Treat it as a lower bound on full-pipeline cost per document, not a replacement for the estimate.
+**Measured (October 2026):** A traced eval run (12 cases, 40 chat calls) used 16,802 input and 2,455 output tokens, about 1,400 input and 205 output per case, or roughly $0.002 per case at the prices above. This is lower than the estimate because the eval doesn't run the executive-summary agent and feeds the later agents ground-truth claims. Treat it as a lower bound on full-pipeline cost per document, not a replacement for the estimate.
 
 ### The actual cost driver at scale isn't inference — it's the Search tier floor
 
@@ -82,9 +82,9 @@ Putting it together at illustrative volumes:
 
 | Docs reviewed/month | Est. LLM inference cost | Azure AI Search (Basic) | Total |
 |---|---|---|---|
-| 100 | ~$0.33 | $75 | ~$75.33 |
-| 1,000 | ~$3.30 | $75 | ~$78.30 |
-| 10,000 | ~$33 | $75 (likely need Standard soon) | ~$283 |
+| 100 | ~$0.80 | $75 | ~$75.80 |
+| 1,000 | ~$8 | $75 | ~$83 |
+| 10,000 | ~$80 | $75 (likely need Standard soon) | ~$330 |
 
 **The non-obvious takeaway:** at this knowledge-base size, scaling review *volume* is nearly free on the model side — going from 100 to 10,000 documents/month moves inference cost by tens of dollars, not thousands. The real cost-to-scale question isn't "how many documents can we afford to review," it's "how big does the knowledge base get, and what query throughput does that demand" — because that's what determines the Search tier, and the Search tier is the dominant fixed cost by an order of magnitude at low-to-moderate volume. This also means the system doesn't get meaningfully cheaper per-document at scale (no real economies of scale in the LLM cost), but it doesn't get punishingly expensive either — cost scales roughly linearly with claims extracted, which scales with document volume and complexity, not with some worse-than-linear factor.
 
