@@ -49,7 +49,7 @@ So per document: **3 fixed chat calls + 1 chat call per claim**, plus **1 embedd
 
 ### Estimated $ cost per document
 
-Token usage was not recorded when these figures were produced: LangSmith tracing was on, but it captured only the LangGraph agent steps, not the individual Azure OpenAI calls or their token counts. The figures below are therefore **engineering estimates** based on actual prompt/context sizes in `src/agents/*.py`, not measured data. The Azure OpenAI client has since been wrapped with LangSmith's `wrap_openai`, so future eval runs (with `LANGSMITH_TRACING=true`) record per-call token counts; re-run the eval and use those measured figures before citing a final number in the capstone report.
+Token usage was not recorded when these figures were produced: LangSmith tracing only began on 23 October 2026, when the Azure OpenAI client was wrapped with LangSmith's `wrap_openai`, and there is no trace data from earlier eval runs. The figures below are therefore **engineering estimates** based on actual prompt/context sizes in `src/agents/*.py`, not measured data. Eval runs from 23 October 2026 onward (with `LANGSMITH_TRACING=true`) record per-call token counts; re-run the eval and use those measured figures before citing a final number in the capstone report.
 
 | Call type | Est. input tokens | Est. output tokens | Calls/doc (avg) |
 |---|---|---|---|
@@ -90,5 +90,5 @@ Not included above: LangSmith tracing costs (usage-based beyond its free tier �
 
 1. Implement an actual human sign-off gate for Tier 3–4 outputs — today `review_routing_agent.py` recommends routing but nothing enforces review.
 2. Replace the model-guessed audience/channel field with a human-confirmable one at intake (§2), given it's measurably underdetermined (66.7% accuracy) rather than a solvable prompt problem.
-3. Re-run the eval with LangSmith tracing on (model calls and token usage are now traced via `wrap_openai`) and replace the estimates in §3 with measured figures before quoting a final cost number.
+3. Re-run the eval with LangSmith tracing on (model calls and token usage are traced via `wrap_openai` from 23 October 2026) and replace the estimates in §3 with measured figures before quoting a final cost number.
 4. Expand the eval set well beyond 12 cases before treating any accuracy number here as representative — these are directionally useful, not statistically robust.
