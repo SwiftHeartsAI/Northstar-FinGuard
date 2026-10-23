@@ -25,6 +25,8 @@ These come directly from the eval harness (`src/eval/run_eval.py`), not general 
 | Compliance tier exact accuracy | **85.7%** | 1 of 14 claims was a boundary judgment call between adjacent tiers, not a clean model error (documented in `eval_dataset/cases.json`). |
 | Overall document-tier accuracy | **91.7%** | End-to-end, tier-within-one accuracy is 100% — the model doesn't miss a tier by more than one step in this eval set. |
 
+**Re-run (October 2026):** Re-running the same 12-case eval gave intake audience accuracy 75%, claim extraction precision 75%, grounding recall@3 82%, compliance tier exact accuracy 79% and overall document-tier accuracy 83% (tier-within-one still 100%). The differences from the table above most likely reflect variation in the model's outputs between runs. On a 12-case set, one case moves a document-level score by about 8 points, so these figures are best read as a range rather than a fixed score.
+
 **Audience/channel underdetermination is a fairness-adjacent design issue worth naming explicitly, not just a metric to improve.** A generic public social post genuinely does not contain the signal needed to classify its audience as retail vs. mixed — the ground truth itself sometimes reflects an assumption the drafter made, not something recoverable from the text. Chasing 100% automated accuracy on an underdetermined task would mean overfitting to spurious textual cues. The better fix is a **human-confirmable field**: let the system propose an audience/channel classification but require the submitter to confirm or correct it at intake, rather than treating the model's guess as ground truth. This also has a fairness dimension — a wrong audience classification changes which compliance tier a claim lands in, so an unconfirmed guess could systematically under- or over-flag certain claim types.
 
 **Other limitations:**
@@ -49,7 +51,7 @@ So per document: **3 fixed chat calls + 1 chat call per claim**, plus **1 embedd
 
 ### Estimated $ cost per document
 
-Token usage was not recorded when these figures were produced: LangSmith tracing began on 23 October 2026, when the Azure OpenAI client was wrapped with LangSmith's `wrap_openai`, and there is no trace data from earlier eval runs. The figures below are therefore **engineering estimates** based on actual prompt/context sizes in `src/agents/*.py`, not measured data. Eval runs from 23 October 2026 onward (with `LANGSMITH_TRACING=true`) record per-call token counts; re-run the eval and use those measured figures before citing a final number in the capstone report.
+Token usage was not recorded when these figures were produced: LangSmith tracing began in October 2026, when the Azure OpenAI client was wrapped with LangSmith's `wrap_openai`, and there is no trace data from earlier eval runs. The figures below are therefore **engineering estimates** based on actual prompt/context sizes in `src/agents/*.py`, not measured data. Eval runs from October 2026 onward (with `LANGSMITH_TRACING=true`) record per-call token counts; measured figures from the first such run are below.
 
 | Call type | Est. input tokens | Est. output tokens | Calls/doc (avg) |
 |---|---|---|---|
@@ -66,6 +68,8 @@ Pricing used (approximate; Azure OpenAI, Global Standard, as found August 2026):
 - **Chat cost/doc** ≈ (3,880 × $0.25 + 1,140 × $2.00) / 1,000,000 ≈ **$0.0033**
 - **Embedding cost/doc** ≈ negligible (< $0.000001)
 - **≈ $0.003–0.004 per document reviewed**, essentially all of it LLM inference, none of it meaningfully from embeddings.
+
+**Measured (October 2026):** A traced eval run (12 cases, 40 chat calls) used 16,802 input and 2,455 output tokens, about 1,400 input and 205 output per case, or roughly $0.0008 per case at the prices above. This is lower than the estimate because the eval doesn't run the executive-summary agent and feeds the later agents ground-truth claims. Treat it as a lower bound on full-pipeline cost per document, not a replacement for the estimate.
 
 ### The actual cost driver at scale isn't inference — it's the Search tier floor
 
@@ -90,5 +94,5 @@ Not included above: LangSmith tracing costs (usage-based beyond its free tier �
 
 1. Implement an actual human sign-off gate for Tier 3–4 outputs — today `review_routing_agent.py` recommends routing but nothing enforces review.
 2. Replace the model-guessed audience/channel field with a human-confirmable one at intake (§2), given it's measurably underdetermined (66.7% accuracy) rather than a solvable prompt problem.
-3. Re-run the eval with LangSmith tracing on (model calls and token usage are traced via `wrap_openai` from 23 October 2026) and replace the estimates in §3 with measured figures before quoting a final cost number.
+3. Measure full-pipeline token usage with tracing on (for example, traced runs through the app, which include the executive summary) and replace the estimates in §3 with measured figures before quoting a final cost number.
 4. Expand the eval set well beyond 12 cases before treating any accuracy number here as representative — these are directionally useful, not statistically robust.

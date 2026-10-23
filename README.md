@@ -94,7 +94,7 @@ python -m src.eval.run_eval
 python -m src.eval.run_eval --save results.json   # also saves raw per-case results under eval_dataset/
 ```
 
-Current results (`eval_dataset/results_final.json`): 100% claim extraction recall, 83.3% precision, 100% evidence retrieval recall@5, 85.7% compliance-tier exact accuracy, 91.7% end-to-end document-tier accuracy. Full metric history and known limitations are in [`docs/system_overview_and_eval.md`](docs/system_overview_and_eval.md) and [`docs/ethics_and_cost_to_scale.md`](docs/ethics_and_cost_to_scale.md).
+Current results (`eval_dataset/results_final.json`): 100% claim extraction recall, 83.3% precision, 100% evidence retrieval recall@5, 85.7% compliance-tier exact accuracy, 91.7% end-to-end document-tier accuracy (a re-run in October 2026 scored 75% precision, 79% compliance-tier exact accuracy and 83% document-tier accuracy; see the docs for details). Full metric history and known limitations are in [`docs/system_overview_and_eval.md`](docs/system_overview_and_eval.md) and [`docs/ethics_and_cost_to_scale.md`](docs/ethics_and_cost_to_scale.md).
 
 ## Docs
 

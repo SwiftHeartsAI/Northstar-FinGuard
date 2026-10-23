@@ -71,6 +71,8 @@ The repo has three saved eval runs — `results_baseline.json` → `results_afte
 | Citation faithfulness | 100% | 100% | 100% |
 | Overall (document-level) tier accuracy | 58.3% | 58.3% | **91.7%** |
 
+**Re-run (October 2026):** Re-running the same eval (not saved as a results file) gave claim extraction precision 75%, intake audience accuracy 75%, compliance tier exact accuracy 79% and document-level tier accuracy 83%. All other metrics matched the final run. This most likely reflects variation in the model's outputs between runs rather than a code change. The re-run had two tier misses: `clean_multi_claim_institutional` (expected Tier 1, got Tier 2) again, plus `fee_free_first_year` (expected Tier 3, got Tier 2). The second is an **under-flagging** error, the riskier direction, so the over-flagging-only miss described below held for the final run but not for this re-run.
+
 **Worth flagging, not smoothing over:** intake audience accuracy is the one metric that got *worse* over the iteration series (83.3% → 66.7%) while everything else improved — likely a side effect of whatever prompt/logic change fixed channel accuracy to 100%, or noise from the small 12-case set (each case is ~8.3 points). This is the same underdetermination issue discussed in `docs/ethics_and_cost_to_scale.md` §2 (audience often genuinely isn't recoverable from text alone) rather than a straightforward regression to chase.
 
 **Remaining known miss in the final run:** case `clean_multi_claim_institutional` — expected `Tier 1`, got `Tier 2`. This is an over-flagging error (safer failure direction than under-flagging a real violation), and evidence retrieval recall is 100% in the final run, so it's a risk-scoring judgment call rather than a retrieval gap.
